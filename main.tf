@@ -19,24 +19,37 @@ data "aws_ami" "amzn2023_ami" {
   }
 }
 
+resource "aws_instance" "api_instance" {
+  ami           = data.aws_ami.amzn2023_ami.id
+  instance_type = var.instance_type
 
-resource "aws_instance" "ec2_instance" {
-  ami                         = data.aws_ami.amzn2023_ami.id
-  instance_type               = var.instance_type
   associate_public_ip_address = true
   tags = {
-    name = "environment_${var.instance_env}"
+    name = upper("environment_${var.instance_env}")
   }
 }
 
+resource "aws_s3_bucket" "config_s3_bucket" {
+  bucket = join("_", ["amazon", var.config_s3_bucket_name])
+}
+
+
+output "check_length" {
+  value = length(trimspace(" elephant "))
+}
+
 output "instance_id" {
-  value = aws_instance.ec2_instance.id
+  value = aws_instance.api_instance.id
 }
 
 output "instance_ip" {
-  value = aws_instance.ec2_instance.public_ip
+  value = aws_instance.api_instance.public_ip
 }
 
 output "instance_dns" {
-  value = aws_instance.ec2_instance.public_dns
+  value = aws_instance.api_instance.public_dns
 }
+
+/*
+Use only the outputs needed so you don't pollute the codebase
+*/
