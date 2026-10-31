@@ -21,7 +21,6 @@ data "aws_ami" "amzn2023-ami" {
 
 
 resource "aws_instance" "ec2_instance" {
-  ami = data.aws_ami.amzn2023-ami
-  instance_type = "t3.micro"
-  
+  ami           = data.aws_ami.amzn2023-ami
+  instance_type = var.instance_type
 }
