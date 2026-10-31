@@ -20,17 +20,19 @@ data "aws_ami" "amzn2023_ami" {
 }
 
 resource "aws_instance" "api_instance" {
+  count         = var.enable_ec2_creation ? 1 : 0
   ami           = data.aws_ami.amzn2023_ami.id
   instance_type = var.instance_type
 
-  associate_public_ip_address = true
+  associate_public_ip_address = var.associate_public_ip
   tags = {
     name = upper("environment_${var.instance_env}")
   }
 }
 
 resource "aws_s3_bucket" "config_s3_bucket" {
-  bucket = join("_", ["amazon", var.config_s3_bucket_name])
+  count  = var.enable_s3_bucket_creation ? 1 : 0
+  bucket = join("-", ["amazon", var.config_s3_bucket_name])
 }
 
 
@@ -39,15 +41,21 @@ output "check_length" {
 }
 
 output "instance_id" {
-  value = aws_instance.api_instance.id
+  value = aws_instance.api_instance[*].id
 }
 
 output "instance_ip" {
-  value = aws_instance.api_instance.public_ip
+  value = aws_instance.api_instance[*].public_ip
 }
 
 output "instance_dns" {
-  value = aws_instance.api_instance.public_dns
+  value = aws_instance.api_instance[*].public_dns
+}
+
+output "instance_arn" {
+  value     = aws_instance.api_instance[*].arn
+  sensitive = true
+
 }
 
 /*
