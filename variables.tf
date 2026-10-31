@@ -4,3 +4,8 @@ variable "instance_type" {
   default     = "t3.micro"
 }
 
+variable "instance_env" {
+  description = "EC2 environment this instance belongs to"
+  type        = string
+  default     = "pre_prod"
+}
